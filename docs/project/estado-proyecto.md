@@ -65,7 +65,9 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 ## Entorno nativo en el portátil (verificado 29/09/2026)
 - setup_native.sh completo sin errores; check_native.sh: 15 correctas, 0 fallidas (Ubuntu 24.04.5, Gazebo 8.15.0 = Harmonic, ROS Jazzy, SIH; 64 tests correctos; origen SIH = ops/toulouse.yaml; vehicle_status_v1 con datos, nav_state=4)
 - Fallos menores de la primera ejecución de setup_native.sh, ya corregidos en drone-sim: falso aviso del agente XRCE (pipefail) y numpy 2.x tapando al del sistema en .deps/pylibs (ahora numpy<2). Verificado en clon limpio: setup sin avisos y check_native.sh con 15 correctas, 0 fallidas y 64 tests
-- Pendiente de probar en el portátil: escenarios completos (s2_scenarios.py sim01, sim19_pause, sim19_rtl, sim20) y sitl_drop_guard_test.py; SIM=gz (Gazebo) con la gráfica integrada
+- Escenarios verificados en el portátil (29/09/2026, PX4 SITL SIH, una simulación limpia por escenario; drone-sim en ed732e2): s2_scenarios.py sim19_pause PASA (CONTINGENCY en 1,2 s), sim19_rtl PASA (CONTINGENCY en 1,2 s), sim20 Donostia PASA (PREFLIGHT → … → COMPLETED sin cambiar código), sim01 Toulouse PASA (misión completa, unos 12 min con el arranque); tests/sitl_drop_guard_test.py PASA 6/6 casos (A–F). Resultados equivalentes a los de la nube (§Hito S2)
+- Pendiente de probar en el portátil: SIM=gz (Gazebo) con la gráfica integrada (no lo necesita S3)
+- Higiene: con stdin cerrado, PX4 SITL repite el prompt `pxh>` sin parar y el log de start_sim.sh llegó a 5,5 GB en ~25 min de simulación; lanzar PX4 sin terminal (`< /dev/null` o `-d`) o no volcar su salida a fichero. Pendiente de corregir en drone-sim
 
 ## Hito S1
 - RUNBOOK_S1.md (Docker, legado; ahora en drone-sim/legacy); ya no se necesitan sus resultados: los sustituye la comprobación nativa
@@ -78,6 +80,6 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - Coordenadas del terreno de Blagnac; GNSS FTS no u-blox; UARTs/GPIO RPi5; 868 MHz duty cycle; MAVSDK; comando MAVLink de confirmación de suelta
 
 ## Siguiente
-- Probar en el portátil los escenarios completos (s2_scenarios.py) y sitl_drop_guard_test.py; después, hito S3 (suelta real; generar px4_msgs desde el msg/ del fork drone-px4 porque release/1.17 no trae DropGuardStatus.msg)
-- Ejecutar los escenarios S2 en el portátil (SIM-01, SIM-19, SIM-20) y la prueba de integración de drop_guard
-- S3 (payload_manager + drop_guard desde el fork + px4_msgs del fork + confirmación de suelta)
+- Hito S3 (suelta real): generar px4_msgs desde el msg/ del fork drone-px4 (release/1.17 no trae DropGuardStatus.msg; es el bloqueo principal), payload_manager con gripper simulado, drop_guard desde el fork y confirmación de suelta desde QGroundControl (ADR-006)
+- Corregir el párrafo de estado de DOC-10 §8 (dice que los scripts están pendientes de ejecutar) y evitar el log de `pxh>` en start_sim.sh
+- Después de S3: fijar drone.repos a un commit o tag de drone-ros; coordenadas de Blagnac antes de S4
