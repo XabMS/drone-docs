@@ -1,0 +1,10 @@
+# Editores y sistema
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Python (herramientas como Doorstop)
+__pycache__/
+*.pyc
+.venv/
