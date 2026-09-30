@@ -63,6 +63,22 @@ Son 20 requisitos iniciales: 6 de misión y prestaciones, 9 de seguridad derivad
 
 AR-018 es el requisito que protege la hipótesis de arquitectura: es el que justifica que ROS 2 quede en DAL C.
 
+**Derivados de la FHA v0.2 (30/09/2026, propuestos, sin validar)**
+
+Cubren las condiciones de fallo nuevas (FC-13 a FC-20) y las dos que no tenían ningún AR (FC-01, FC-06). AR-028 y AR-029 vienen del análisis de seguridad de la información (DOC-15) y ya tienen SR-SEC hijos. Los AR-021 a AR-027 van sin SR hijo hasta la PSSA; SR-PLD-005 pasa a colgar de AR-027. El FDAL de AR-021 y AR-025 es provisional: cubren una condición catastrófica reduciendo la exposición, y la PASA decidirá si basta.
+
+| ID | Requisito | Padre | FDAL | Verif. |
+| --- | --- | --- | --- | --- |
+| AR-021 | Las rutas de misión solo deberán discurrir por corredores aprobados de baja densidad de población y evitar las zonas prohibidas. | FC-01, FC-08, FC-13, FC-14, FC-17, AS-002 | B | A, T |
+| AR-022 | Ningún fallo simple de un motor, ESC o hélice deberá producir una condición catastrófica. **No es alcanzable con el cuadricóptero actual** (FHA §5, PA-01): queda como objetivo hasta que un ADR decida cómo se trata. | FC-13 | A | A |
+| AR-023 | La aeronave deberá vigilar en vuelo la tensión por celda y la temperatura de la batería de vuelo y ejecutar un aterrizaje inmediato cuando salgan de los límites del fabricante de la celda. | FC-14 | B | T |
+| AR-024 | PX4 deberá limitar toda consigna del computador de misión a la envolvente aprobada (volumen operacional, altura máxima y velocidad), de modo que un comportamiento erróneo del computador no pueda sacar a la aeronave del volumen ni ordenar una suelta fuera de zona. | FC-16, FC-08, FC-05 | B | A, T |
+| AR-025 | Las rutas deberán mantener una separación vertical de al menos \[TBD-9\] m sobre los obstáculos conocidos y respetar las zonas de autorización de aeródromos. | FC-17, AS-006 | B | A, I |
+| AR-026 | La aeronave solo deberá armarse por orden explícita del piloto remoto tras superar las comprobaciones de prevuelo, y deberá desarmarse automáticamente si no despega en \[TBD-8\] s. | FC-18 | C | T |
+| AR-027 | La velocidad de descenso del paquete tras la suelta no deberá superar \[TBD-6\] m/s. | FC-06 | C | T |
+| AR-028 | La aeronave solo deberá ejecutar órdenes de mando de origen autenticado y no reproducibles; las que cortan los motores o terminan el vuelo solo las aceptará por el RC del piloto de seguridad y por el FTS. | FC-19, FC-05, FC-11 | B | A, T |
+| AR-029 | Con la aeronave armada no deberán poder cambiarse los parámetros ni los ficheros que definen los límites de contención, la geofence y la zona de suelta, y cualquier intento se registrará. | FC-20, FC-08, FC-05 | B | T |
+
 ## 3. Hipótesis y valores por determinar
 
 Las hipótesis se validan igual que los requisitos (Planes §3). Si una resulta falsa, hay que reabrir la FHA.
@@ -74,12 +90,15 @@ Las hipótesis se validan igual que los requisitos (Planes §3). Si una resulta 
 | AS-003 | La operación es diurna y en condiciones meteorológicas visuales, sin precipitación. | AR-004 |
 | AS-004 | El piloto remoto supervisa una sola aeronave y está disponible durante todo el vuelo. | FC-10, AR-017 |
 | AS-005 | La cobertura GNSS es suficiente en la zona de operación a la altura de crucero. | FC-03, AR-014 |
+| AS-006 | En los corredores aprobados y por debajo de 120 m AGL el riesgo de encontrar una aeronave tripulada es bajo, y los aeródromos cercanos (p. ej. Blagnac) se excluyen con zonas de autorización. | FC-17, AR-025 |
 
 | TBD | Valor pendiente | Cómo se fija |
 | --- | --- | --- |
 | TBD-1 | Tiempo para detectar carga no liberada | Diseño del mecanismo de suelta |
 | TBD-2 | Tiempo de pérdida de C2 antes de la contingencia | Análisis de la tecnología de enlace; en PX4 corresponde a COM\_DL\_LOSS\_T |
 | TBD-3 | Tiempo para detectar la degradación de navegación | Análisis de deriva frente al margen de contención |
+| TBD-8 | Tiempo de espera para desarmar si no se despega (AR-026) | Procedimientos del hub (DOC-12) y parámetros de PX4 |
+| TBD-9 | Separación vertical mínima sobre obstáculos conocidos (AR-025) | Datos de obstáculos de la ruta y precisión vertical de la navegación |
 
 ## 4. Estructura en Doorstop
 
@@ -119,7 +138,7 @@ La validación y la publicación se añaden a GitHub Actions: cada pull request 
 
 ## 5. Requisitos de sistema (borrador v0.1)
 
-Son 45 requisitos repartidos en los 8 sistemas de DOC-05; todo AR tiene al menos un SR hijo, salvo AR-002 (masa), que se verifica a nivel aeronave con el presupuesto de DOC-08. Los nombres de parámetros de PX4 son orientativos y se comprueban en la versión fijada.
+Son 45 requisitos repartidos en los 8 sistemas de DOC-05; todo AR tiene al menos un SR hijo, salvo AR-021 a AR-027 (derivados de la FHA v0.2, a la espera de la PSSA) y AR-002 (masa), que se verifica a nivel aeronave con el presupuesto de DOC-08. Los nombres de parámetros de PX4 son orientativos y se comprueban en la versión fijada.
 
 **Nuevos valores pendientes:** TBD-4 tiempo sin latido Offboard antes del failsafe; TBD-5 tiempo de reacción del FTS; TBD-6 velocidad máxima de descenso del paquete con paracaídas; TBD-7 factor de seguridad de la retención de la carga.
 
@@ -170,7 +189,7 @@ Motivo de SR-MSN-011-D: la Pausa de QGroundControl no cambia el modo de PX4, as�
 | SR-PLD-002 | El PLD solo liberará la carga si se cumplen a la vez: orden del MSN, emitida solo tras la confirmación del piloto desde tierra (ADR-006), y autorización del FMS (SR-FMS-007). | AR-007, AR-008 | C | T |
 | SR-PLD-003 | Ante pérdida de alimentación o de señal, el mecanismo de suelta quedará cerrado y retendrá la carga. | AR-008, FC-05 | C | T |
 | SR-PLD-004 | El PLD detectará la presencia de la carga e informará al MSN de si se ha liberado en menos de TBD-1 s tras la orden. | AR-009 | C | T |
-| SR-PLD-005 | El paracaídas del paquete limitará la velocidad de descenso de 1 kg a TBD-6 m/s como máximo desde la altura mínima de suelta. | FC-06 | C | T |
+| SR-PLD-005 | El paracaídas del paquete limitará la velocidad de descenso de 1 kg a TBD-6 m/s como máximo desde la altura mínima de suelta. | AR-027, FC-06 | C | T |
 
 **COM: comunicaciones**
 
@@ -180,7 +199,7 @@ Motivo de SR-MSN-011-D: la Pausa de QGroundControl no cambia el modo de PX4, as�
 | SR-COM-002 | El COM enviará a tierra posición, altura, modo, estado de energía y calidad del enlace al menos a 1 Hz. | AR-016 | C | T |
 | SR-COM-003 | El COM medirá la latencia y la pérdida de paquetes del enlace C2 y las enviará a tierra. | AR-016 | C | T |
 | SR-COM-004 | El enlace RC del piloto de seguridad será independiente del LTE (radio directa, banda de 2,4 GHz). | AR-017 | C | I |
-| SR-COM-005-D | El enlace C2 estará cifrado y autenticado extremo a extremo. | Derivado (seguridad de la información) | C | I, T |
+| SR-COM-005-D | El enlace C2 entre la GCS y el companion estará cifrado y autenticado (VPN). La autenticidad de las órdenes hasta la FMU la cubren SR-SEC-002-D y SR-SEC-003-D (DOC-15). Revisado el 30/09/2026: el texto anterior decía «extremo a extremo», que la VPN no cumple si el companion no es de confianza. | Derivado (seguridad de la información) | C | I, T |
 
 **FTS: terminación de vuelo**
 
@@ -194,6 +213,28 @@ Motivo de SR-MSN-011-D: la Pausa de QGroundControl no cambia el modo de PX4, as�
 | SR-FTS-006 | El FTS usará el volumen de contingencia del mismo fichero de operación que el MSN; ambos comprobarán la versión en prevuelo. | AR-019 | B | T |
 | SR-FTS-007 | El FTS ejecutará un autotest al arrancar y admitirá una prueba funcional en prevuelo sin cortar la potencia real. | AR-011 | B | T |
 | SR-FTS-008 | La pérdida del enlace del FTS no provocará la terminación; se señalizará por I-08. | AR-012 | A | T |
+
+**SEC: seguridad de la información (derivados, 30/09/2026, pendientes de revisión por seguridad)**
+
+Salen del modelo de amenazas de DOC-15. El IDAL es el de la condición de fallo que protegen. Los que exigen cambiar PX4 (SR-SEC-002, 003, 004, 009 y 012) necesitan un ADR antes de implementarse, porque el fork solo tiene hoy `drop_guard`.
+
+| ID | Requisito | Padre | IDAL | Verif. |
+| --- | --- | --- | --- | --- |
+| SR-SEC-001-D | El companion solo aceptará tráfico C2 por una VPN WireGuard con clave propia de cada dispositivo (companion y GCS); no expondrá ningún servicio en la interfaz LTE salvo el puerto de la VPN, y las claves se podrán revocar sin cambiar el software. | AR-028, SR-COM-005-D | C | I, T |
+| SR-SEC-002-D | Las órdenes de mando de la GCS llegarán a la FMU con una autenticidad que la propia FMU compruebe, o con la alternativa que fije el ADR C de DOC-15 §7. Si PX4 no la admite, se documenta la desviación en lugar de rebajar el requisito. | AR-028 | C | A, T |
+| SR-SEC-003-D | La FMU no aceptará por el enlace C2 de LTE la terminación de vuelo, el desarme forzado en vuelo ni el corte de motores. | AR-028, FC-11 | B | T |
+| SR-SEC-004-D | `drop_guard` solo autorizará la apertura dentro de una ventana de tiempo abierta por una autorización del piloto que el computador de misión no pueda generar por sí solo (mecanismo por el ADR A de DOC-15 §7). Refuerza SR-PLD-002 y SR-FMS-007; no los sustituye. Exigible antes del primer vuelo con la confirmación por LTE o fuera de la vista (ADR-010); hasta entonces, aceptado. | AR-007, AR-028, FC-05 | C | T |
+| SR-SEC-005-D | La confirmación de suelta y la orden de apertura llevarán el identificador de la suelta y una caducidad; se rechazará toda orden repetida, reordenada o caducada, y habrá una sola apertura por suelta. | AR-007, FC-05 | C | T |
+| SR-SEC-006-D | Solo `mission_manager` y `payload_manager` podrán publicar en `/fmu/in/*`; el DDS del companion no aceptará participantes ajenos (SROS2 o aislamiento equivalente: descubrimiento limitado a localhost y usuarios de sistema separados). | AR-024, FC-16 | C | I, T |
+| SR-SEC-007-D | El companion tendrá servicios de red mínimos, SSH solo por clave y solo por la VPN, sin puertos de depuración activos en vuelo y con actualizaciones solo desde la baseline. | FC-16 | C | I |
+| SR-SEC-008-D | El software del companion y el firmware de PX4 se instalarán solo desde artefactos con hash fijado en la baseline, y la versión y el hash se registrarán en cada armado. | FC-16, SR-FMS-009 | C | I |
+| SR-SEC-009-D | Con la aeronave armada, PX4 rechazará el cambio de los parámetros de contención y de failsafe (los que liste la baseline) y de los `DG_*`, y registrará el intento. La integridad de la configuración de operación se comprobará con un hash criptográfico, no con un CRC. | AR-029 | B | T |
+| SR-SEC-010-D | Todo mando rechazado por autenticación se registrará con su origen y su hora en el ULog o en el rosbag2. | AR-020, AR-028 | D | I, D |
+| SR-SEC-011-D | Los repositorios no contendrán claves, contraseñas ni credenciales, y el CI escaneará secretos en cada PR. | FC-16 | D | I |
+| SR-SEC-012-D | El FMS tratará los indicadores de interferencia y suplantación del receptor GNSS (`jamming_state`, `spoofing_state`) como pérdida de una navegación válida a efectos de AR-014. | AR-014, FC-02 | B | T |
+| SR-SEC-013-D | Los enlaces de RC y del FTS usarán claves únicas por aeronave, y una grabación de una orden de armado o de terminación no producirá efecto al repetirla. La segunda parte depende de PA-SEC-02 (DOC-15). | AR-012, FC-11 | A | A, T |
+
+**Cobertura AR → SR-SEC:** AR-028 → SEC-001…005, 010 · AR-029 → SEC-009. Sin AR propio: SEC-006 (AR-024), SEC-007, 008, 011 (FC-16), SEC-012 (AR-014), SEC-013 (AR-012).
 
 **GND, PWR y PRP**
 

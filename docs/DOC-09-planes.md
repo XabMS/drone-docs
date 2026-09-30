@@ -23,7 +23,7 @@ flowchart LR
 | PDR: revisión preliminar de diseño | Tras arquitectura | DOC-05, DOC-06, PASA/PSSA, DAL asignados, ADR de HW |
 | CDR: revisión crítica de diseño | Antes de implementar en serio | DOC-07, DOC-08, requisitos de ítem, procedimientos de prueba |
 | TRR: revisión de preparación de ensayos | Antes de cada campaña SIL/HIL | Procedimientos aprobados, configuración congelada |
-| FRR: revisión de aptitud para vuelo | Antes del primer vuelo real | HIL superado, FTS probado, OM (DOC-12), seguro y permisos |
+| FRR: revisión de aptitud para vuelo | Antes del primer vuelo real | HIL superado, FTS probado, OM (DOC-12), seguro y permisos; condición de ADR-010 cumplida si la confirmación de suelta llega por LTE o el vuelo es fuera de la vista |
 | Cierre de fase | Al final de cada fase (1, 2, 3) | SSA actualizada, matriz de trazabilidad completa, lecciones aprendidas |
 
 La fase 1 recorre la V entera dos veces: primero en simulación (hasta TRR SIL) y luego con hardware (hasta FRR). Las fases 2 y 3 reabren la V desde el ConOps con análisis de impacto sobre lo ya aprobado.
