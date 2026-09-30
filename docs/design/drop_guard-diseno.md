@@ -65,6 +65,19 @@ flowchart LR
 | DG\_POS\_TOUT | int | ms | 50–1000 | Antigüedad máxima de la posición |
 | DG\_ZONE\_HASH | int | — | — | Hash de la zona calculado por el MSN; se muestra al piloto en prevuelo |
 
+**Entrada de autorización del piloto (reservada, ADR-010; no implementada)**
+
+En la versión actual `drop_guard` no recibe ninguna autorización del piloto y la lógica de §3 no cambia. Se reserva, sin crearla todavía:
+
+| Elemento | Contenido reservado |
+| --- | --- |
+| Entrada uORB | `drop_authorization` (mensaje nuevo, por definir): identificador de suelta, instante de caducidad y prueba de origen |
+| Estado | «sin ventana»: sin autorización vigente no se abre; es la condición por defecto cuando la entrada se active |
+| Motivo de rechazo | `NO_AUTH`, al final de la lista de §3 |
+| Activación | Un parámetro, apagado hasta la condición de ADR-010; al activarlo, la apertura exige además una ventana vigente |
+
+Incorporarla cambiará `msg/`, el parche y el ICD (DOC-06 §3), y se hará con su propio issue.
+
 **Nota sobre la precisión de float:** un float de 32 bits guardaría la latitud con resolución de unos 0,4 m en estas latitudes. Por eso latitud y longitud se guardan como enteros en grados × 10⁷ (resolución de 1 cm), igual que hace MAVLink.
 
 ## 3. Lógica de autorización
@@ -189,4 +202,5 @@ Diez requisitos de ítem trazados sobre todo a SR-FMS-007 y SR-PLD-003 (y dos a 
 - [ ] Comprobar cómo trata commander un VEHICLE\_CMD\_DO\_GRIPPER (que no responda "no soportado" en paralelo al ack de drop\_guard).
 - [ ] Fijar los valores de DG\_EPH\_MAX y DG\_EPV\_MAX con datos del M10 en vuelo (el umbral de precisión pendiente en el ICD).
 - [ ] Decidir el algoritmo de DG\_ZONE\_HASH (p. ej. CRC32 de los parámetros de la zona) y dónde lo ve el piloto en QGroundControl.
+- [ ] Elegir el mecanismo de la autorización con caducidad (desafío-respuesta con HMAC o segundo canal físico) antes de la condición de ADR-010; comprobar si PX4 trae una librería criptográfica reutilizable.
 - [ ] Polígono en lugar de círculo en una versión posterior, si las zonas de suelta reales lo piden.
