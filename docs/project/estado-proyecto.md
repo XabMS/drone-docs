@@ -37,6 +37,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - ADR-007 F5 (FDAL B) = payload_manager ROS 2 (C) + módulo drop_guard en fork de PX4 (C) (aceptada)
 - ADR-008 FMU-companion por UART (propuesta)
 - ADR-009 AR-003: 5 km objetivo de sistema (simulación); prototipo fase 1 ≥1,5 km (aceptada)
+- ADR-010 La confirmación del piloto la comprueba solo payload_manager: se acepta en S3 y simulación; A3 (CH7) opcional a la vista; autorización con caducidad comprobada por drop_guard obligatoria antes del primer vuelo real con la confirmación por LTE o fuera de la vista. Interfaz reservada en el diseño, sin implementar (aceptada, 30/09/2026)
 
 ## PX4 v1.17 — hechos comprobados
 - Tópicos DDS con sufijo _vN si MESSAGE_VERSION != 0 (vehicle_status_v1, vehicle_local_position_v1, battery_status_v1, home_position_v1); confirmado en vivo. vehicle_global_position NO lleva sufijo
@@ -73,8 +74,9 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - RUNBOOK_S1.md (Docker, legado; ahora en drone-sim/legacy); ya no se necesitan sus resultados: los sustituye la comprobación nativa
 
 ## Documentos
-- DOC-03: AR-001..AR-020 (+ AR-021..027 propuestos desde la FHA v0.2, 30/09/2026), AS-001..006, TBD-1..9; SR v0.1: 45 + 2 derivados
-- DOC-01 (ConOps) y DOC-04 (FHA v0.2, FC-01..FC-18) extraídos del índice a ficheros propios el 30/09/2026. FC-13 (motor) y FC-14 (batería) incumplen el objetivo de fallo simple del MOC Light-UAS.2510 por diseño (PA-01); objetivos del MOC sin cotejar con el texto oficial (PA-02)
+- DOC-03: AR-001..AR-020 (+ AR-021..029 propuestos desde la FHA v0.2 y DOC-15, 30/09/2026), AS-001..006, TBD-1..9; SR v0.1: 45 + 2 derivados
+- DOC-01 (ConOps) y DOC-04 (FHA v0.2, FC-01..FC-20) extraídos del índice a ficheros propios el 30/09/2026. FC-13 (motor) y FC-14 (batería) incumplen el objetivo de fallo simple del MOC Light-UAS.2510 por diseño (PA-01); objetivos del MOC sin cotejar con el texto oficial (PA-02)
+- DOC-15 (seguridad de la información, 30/09/2026): PX4 v1.17.0 no implementa la firma de MAVLink 2; acepta terminación de vuelo, desarme forzado y `PARAM_SET` sin comprobar origen ni armado; `drop_guard` no conoce la confirmación del piloto (la exige solo `payload_manager`). Requisitos SR-SEC-001..013 propuestos; ADR A, B y C pendientes
 - DOC-06 ICD v0.1; DOC-08 Hardware v0.1; DOC-10 Simulación v0.1 (S2 marcado terminado; §2, §6, §8 y estado actualizados a entorno nativo el 29/09/2026; su párrafo de estado dice que los scripts están pendientes de ejecutar: ya se ejecutaron)
 
 ## Preguntas abiertas

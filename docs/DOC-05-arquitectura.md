@@ -214,7 +214,7 @@ Doorstop es la fuente de verdad de los requisitos; Papyrus lo es de la arquitect
 
 ## 8. Decisiones de arquitectura (ADR) y preguntas abiertas
 
-Siete decisiones aceptadas y dos propuestas; ninguna abierta.
+Ocho decisiones aceptadas y dos propuestas; ninguna abierta.
 
 | ADR | Decisión | Estado |
 | --- | --- | --- |
@@ -228,6 +228,17 @@ Siete decisiones aceptadas y dos propuestas; ninguna abierta.
 | ADR-008 | Interfaz FMU ↔ companion por UART (la Pixhawk 6C Mini no tiene Ethernet); ver DOC-08 | Propuesta (sigue a DOC-08) |
 
 **ADR-009 (aceptada, 25/09/2026):** AR-003 se divide en un objetivo de sistema (5 km de radio, validado en simulación) y un límite del prototipo físico de fase 1 (al menos 1,5 km). Motivo: el presupuesto de energía del X500 V2 con 1 kg de carga (DOC-08 §4).
+
+**ADR-010 (aceptada, 30/09/2026):** la confirmación del piloto la comprueba solo `payload_manager`; `drop_guard` autoriza por posición, altura y precisión, pero no la conoce (DOC-15, hallazgo 1). Se decide por fases:
+
+- **S3 y simulación:** se acepta el estado actual. Riesgo registrado: una orden de apertura dentro de la zona y de la banda de altura, sin confirmación, por un ataque o por un fallo de `payload_manager`. El efecto es FC-05 con AS-001 sin comprobación operativa; lo acota la zona de `drop_guard`.
+- **Ensayos a la vista:** `drop_guard` puede leer CH7 como autorización independiente del companion (opcional, ADR-006).
+- **Condición de caducidad:** antes del primer vuelo con hardware real en el que la confirmación llegue por LTE, o fuera de la vista, `drop_guard` exigirá una autorización con caducidad que el companion no pueda fabricar (desafío-respuesta con HMAC o segundo canal físico; el mecanismo se decide en un ADR posterior). Un comando MAVLink sin firma no vale: PX4 v1.17.0 no la implementa. La condición se comprueba en la FRR (DOC-09 §0).
+- **Reserva de interfaz, sin implementar:** `design/drop_guard-diseno.md` §2 reserva la entrada de autorización y el estado «sin ventana».
+
+No cambia nada de las condiciones de suelta: sigue haciendo falta la confirmación explícita y la orden se envía una sola vez por suelta, sin reintentos.
+
+Alternativas descartadas: exigir la autorización ya en S3 (retrasa el hito y no hay un atacante real con el que probarla) y aceptar el riesgo sin fecha límite.
 
 **Consecuencias de ADR-003 (LTE):**
 

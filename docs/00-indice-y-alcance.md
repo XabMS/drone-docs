@@ -10,7 +10,7 @@ El enfoque sigue la lógica de ingeniería de sistemas aeronáutica (ARP4754A a 
 
 ## Lista de documentación
 
-Son 14 documentos en 4 fases; los 5 primeros son los que hay que cerrar antes de escribir código serio.
+Son 15 documentos en 4 fases; los 5 primeros son los que hay que cerrar antes de escribir código serio.
 
 | ID | Documento | Qué contiene | Referencia | Fase |
 | --- | --- | --- | --- | --- |
@@ -28,6 +28,7 @@ Son 14 documentos en 4 fases; los 5 primeros son los que hay que cerrar antes de
 | DOC-12 | Manual de operaciones (OM) y procedimientos de emergencia | Checklists, roles del piloto remoto, límites operativos, mantenimiento | Requisito SORA (OSO) | 4. Operación |
 | DOC-13 | Plan de proyecto y registro de riesgos | Hitos, presupuesto, riesgos técnicos/regulatorios/negocio | — | Transversal |
 | DOC-14 | Registro de decisiones (ADR) | Decisiones de arquitectura con alternativas y motivo | — | Transversal |
+| [DOC-15](DOC-15-seguridad-informacion.md) | Análisis de seguridad de la información | Activos, fronteras de confianza, amenazas (STRIDE) sobre las interfaces, controles, requisitos derivados y casos de prueba | ED-202A / DO-326A (inspiración) | Transversal |
 
 Como el proyecto sigue ARP4754A, DOC-09 se amplía al juego de planes que pide la norma (§5.0 y apéndices): Plan de desarrollo, Plan del programa de seguridad, Plan de validación de requisitos, Plan de verificación, Plan de gestión de configuración y Plan de aseguramiento de proceso. Están en la pestaña DOC-09 Planes.
 
