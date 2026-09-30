@@ -229,4 +229,5 @@ El ICD cambia una interfaz de DOC-05 y añade dos paquetes de software; el resto
 - [ ] Revisar las limitaciones de uso de la banda de 868 MHz en Europa para el enlace del FTS.
 - [ ] Posiciones del servo de suelta, cuando se diseñe el mecanismo.
 
+* [ ] Firma MAVLink 2: PX4 v1.17.0 no la implementa (DOC-15, hallazgo 2); la fila «Firma MAVLink 2» de §4 no se cumple hasta que se decida el ADR C.
 * [ ] Definir el comando MAVLink de confirmación de suelta y cómo lanzarlo desde QGroundControl (botón o acción personalizada).

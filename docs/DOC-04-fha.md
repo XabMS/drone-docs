@@ -9,6 +9,7 @@ Evaluación de peligros funcional de la aeronave (ARP4761A, FHA de nivel aeronav
 - Extraída del índice a este fichero.
 - Nuevas FC-13 a FC-18: motor, batería, companion (dos casos), colisión y motores en marcha en tierra. Las contingencias «fallo del companion» y «fallo de motor» del ConOps §5 no tenían FC propia.
 - Corregida la nota sobre el companion: puede causar FC-08 (§4).
+- FC-19 y FC-20 (origen malicioso), añadidas desde el análisis de seguridad de la información (DOC-15). Los ataques son causas de las FC anteriores salvo dos efectos nuevos: la orden de mando falsa y la configuración alterada.
 - Cada FC lleva la justificación de su severidad y los AR que la cubren. FC-01 y FC-06 no tenían ninguno; se añaden AR-021 a AR-027 en DOC-03 (propuestos).
 - Nuevo §3 con el objetivo de fallo simple y qué FC lo incumplen por diseño.
 
@@ -29,7 +30,7 @@ Escala del MOC Light-UAS.2510 de EASA, definida por el efecto en terceros en tie
 
 ## 2. Condiciones de fallo
 
-De 18 condiciones, 7 salen catastróficas (FC-01, 08, 11, 12, 13, 14 y 17). Sin paracaídas de aeronave (D7), la protección tiene que venir de la contención, del FTS y de planificar rutas que no sobrevuelen multitudes.
+De 20 condiciones, 8 salen catastróficas (FC-01, 08, 11, 12, 13, 14, 17 y 19). Sin paracaídas de aeronave (D7), la protección tiene que venir de la contención, del FTS y de planificar rutas que no sobrevuelen multitudes.
 
 | ID | Función | Condición de fallo | Fase de vuelo | Efecto | Severidad propuesta |
 | --- | --- | --- | --- | --- | --- |
@@ -51,6 +52,8 @@ De 18 condiciones, 7 salen catastróficas (FC-01, 08, 11, 12, 13, 14 y 17). Sin 
 | FC-16 | F3 | El companion emite consignas u órdenes erróneas sin que se detecte | Todas | Desvío de la ruta, salida del volumen o orden de suelta indebida | Peligroso (si PX4 y el FTS contienen); si no, es FC-08 o FC-05 |
 | FC-17 | F2, F6 | Colisión con obstáculo o con una aeronave tripulada | Despegue, crucero, aterrizaje | Caída sobre terceros; posible fatalidad en aire | Catastrófico |
 | FC-18 | F1, F8 | Motores en marcha no ordenados en tierra | Prevuelo, hub | Lesiones al operador del hub | Mayor |
+| FC-19 | F4, F8 | La aeronave acepta y ejecuta una orden de mando falsa, repetida o alterada (incluidas las que cortan motores o abren la carga) | Todas | Modo o rumbo no ordenados, terminación de vuelo, desarme forzado o suelta indebida | Catastrófico |
+| FC-20 | F5, F6 | Parámetros o ficheros que fijan la contención, la geofence o la zona de suelta alterados sin autorización | Prevuelo, todas | Contención o zona de suelta desplazadas; combinada con otro fallo, FC-08 o FC-05 | Peligroso |
 
 ## 3. Justificación, mitigaciones y requisitos
 
@@ -76,6 +79,8 @@ Los AR-021 a AR-027 son nuevos y están sin validar (DOC-03 §2). «SR pendiente
 | FC-16 | Ver §4: mientras PX4 y el FTS limiten la aeronave, el efecto queda en Peligroso | Geofence y límites de PX4; vigilancia de consigna (SR-MSN-011-D); `drop_guard` para la suelta; FTS | AR-018, AR-024 |
 | FC-17 | Sin cámara ni detección y evasión (D4) no hay barrera táctica; el choque con una aeronave tripulada puede ser fatal | Solo estratégica: altura máxima 120 m, zonas prohibidas y de autorización, rutas sobre obstáculos conocidos; se evalúa en DOC-02 (ARC) | AR-005, AR-021, AR-025 |
 | FC-18 | Hélices girando cerca del operador: cortes graves posibles, pero afectan a la tripulación, no a terceros | Armado explícito con comprobaciones; procedimientos del hub (DOC-12); hélices retiradas al manipular | AR-026 |
+| FC-19 | Equivale a FC-11 por otra vía: PX4 acepta por MAVLink la terminación y el desarme forzado en vuelo sin comprobar el origen (DOC-15, hallazgo 3) | VPN con clave por dispositivo; autenticación hasta la FMU; sin terminación por el C2; identificador y caducidad en las órdenes irreversibles | AR-028 |
+| FC-20 | Con el FTS cargado con el mismo volumen, un cambio de parámetros no basta por sí solo para la caída, pero anula una barrera | Parámetros inmutables con el dron armado; hash criptográfico de la configuración; registro | AR-029 |
 
 **Requisitos sin SR hijo:** AR-021 a AR-027 quedan «SR pendientes (PSSA)». AR-021 se apoya ya en SR-MSN-002 y AR-024 en SR-MSN-011-D y SR-FMS-001/002, que hay que reasignar al validarlos.
 
@@ -102,6 +107,7 @@ Según el resumen del MOC Light-UAS.2510 (PA-02): una condición catastrófica n
 | FC-13 | **No, por diseño** | Un motor o ESC es un fallo simple y el cuadricóptero no lo tolera |
 | FC-14 | **No, por diseño** | Un fallo de la batería o de su conector es simple y no hay segunda fuente |
 | FC-17 | Solo por exposición | No hay barrera a bordo; se reduce la probabilidad, no el efecto |
+| FC-19 | Por confirmar | Hoy un solo mensaje válido para PX4 basta; depende de SR-SEC-002 y SR-SEC-003 |
 
 FC-13 y FC-14 son huecos nuevos: ADR-005 solo consideraba FC-01 y la opción D (hexáptero u octóptero) la descartaba por peso y coste. Con los objetivos del MOC, lo honesto en este proyecto de aprendizaje es declararlos, como se hizo con F1, y registrarlo en un ADR (PA-01).
 
@@ -118,6 +124,6 @@ FC-13 y FC-14 son huecos nuevos: ADR-005 solo consideraba FC-01 y la opción D (
 - **PA-01.** FC-13 y FC-14 incumplen el objetivo de fallo simple (§5). Opciones: declarar la limitación como en ADR-005 (A + B), pasar a hexáptero u octóptero (opción D), o reconsiderar el paracaídas de aeronave (D7). Se propone un ADR nuevo tras la revisión de este documento.
 - **PA-02.** Cotejar la escala y los objetivos con el texto oficial del MOC Light-UAS.2510 y con ED-280 (§1).
 - **PA-03.** Sin datos de densidad de población de las rutas de Toulouse (AS-002): no se puede argumentar todavía la rebaja del riesgo de ADR-005.
-- **PA-04.** Falta el efecto de los ataques informáticos en esta FHA; se trata en DOC-15 (issue aparte).
+- **PA-04.** Los ataques informáticos se tratan en DOC-15. Lo que quede abierto allí (ADR A, B y C, GNSS) puede reabrir FC-05, FC-08 y FC-11.
 - **PA-05.** TBD-8 (tiempo de armado sin despegue, AR-026) y TBD-9 (separación vertical sobre obstáculos, AR-025) sin valor.
 - **PA-06.** Alimentación de la FMU y del companion: ¿camino único desde el módulo de potencia? Es una pregunta para la ZSA.
