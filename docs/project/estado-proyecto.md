@@ -37,6 +37,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - ADR-007 F5 (FDAL B) = payload_manager ROS 2 (C) + módulo drop_guard en fork de PX4 (C) (aceptada)
 - ADR-008 FMU-companion por UART (propuesta)
 - ADR-009 AR-003: 5 km objetivo de sistema (simulación); prototipo fase 1 ≥1,5 km (aceptada)
+- ADR-010 La confirmación del piloto la comprueba solo payload_manager: se acepta en S3 y simulación; A3 (CH7) opcional a la vista; autorización con caducidad comprobada por drop_guard obligatoria antes del primer vuelo real con la confirmación por LTE o fuera de la vista. Interfaz reservada en el diseño, sin implementar (aceptada, 30/09/2026)
 
 ## PX4 v1.17 — hechos comprobados
 - Tópicos DDS con sufijo _vN si MESSAGE_VERSION != 0 (vehicle_status_v1, vehicle_local_position_v1, battery_status_v1, home_position_v1); confirmado en vivo. vehicle_global_position NO lleva sufijo

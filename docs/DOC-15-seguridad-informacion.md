@@ -12,7 +12,7 @@ Modelo de amenazas ligero del sistema en fase 1. Responde a una pregunta: ¿qué
 
 Seis cosas que el diseño actual no cubre. Las tres primeras cambian decisiones ya aceptadas.
 
-1. **La confirmación del piloto la comprueba un solo miembro.** `drop_guard` autoriza la apertura por posición, altura, precisión y parámetros; no sabe nada de la confirmación del piloto (`design/drop_guard-diseno.md` §3). La exige `payload_manager`, en el companion. Cualquier `DO_GRIPPER` de apertura que llegue a PX4 dentro de la zona (por DDS local o por MAVLink) se acepta sin confirmación. Frente a un fallo, ADR-007 da dos miembros independientes; frente a un ataque, AR-007 depende de uno solo (TH-04, TH-05, TH-01).
+1. **La confirmación del piloto la comprueba un solo miembro** (decidido por fases en ADR-010). `drop_guard` autoriza la apertura por posición, altura, precisión y parámetros; no sabe nada de la confirmación del piloto (`design/drop_guard-diseno.md` §3). La exige `payload_manager`, en el companion. Cualquier `DO_GRIPPER` de apertura que llegue a PX4 dentro de la zona (por DDS local o por MAVLink) se acepta sin confirmación. Frente a un fallo, ADR-007 da dos miembros independientes; frente a un ataque, AR-007 depende de uno solo (TH-04, TH-05, TH-01).
 2. **PX4 v1.17.0 no implementa la firma de MAVLink 2.** Se buscó en `src/modules/mavlink` (30/09/2026) y no hay código de firma. DOC-06 §4 la da por activada «si la versión lo admite»: no se admite. Con ella, `SR-COM-005-D` («extremo a extremo») queda cubierto solo hasta el companion, que es justo el elemento que se trata como comprometible (§2).
 3. **Una orden de C2 puede matar el vuelo.** PX4 acepta por MAVLink o por DDS, sin comprobar el origen, `DO_FLIGHTTERMINATION` (con la aeronave armada pasa a `NAVIGATION_STATE_TERMINATION`) y el desarme forzado en vuelo (`21196` en `COMPONENT_ARM_DISARM`). Es una vía a FC-11 que no pasa por el FTS ni por su doble armado (TH-01).
 4. **Los parámetros de PX4 se pueden cambiar en vuelo.** El manejador de `PARAM_SET` no comprueba el armado ni el origen. Solo `drop_guard` se protege capturando `DG_*` al armar. `GF_*` y los failsafes no (TH-13).
@@ -114,8 +114,8 @@ Estados: **Mitigado** (control existente suficiente), **Abierto** (hay un requis
 | TH-01 | WireGuard entre GCS y companion (DOC-06 §4) | Detrás del companion nada autentica; PX4 no firma MAVLink (hallazgo 2); PX4 acepta terminación y desarme forzado desde cualquier origen (hallazgo 3) | Abierto | SR-SEC-001, 002, 003 |
 | TH-02 | WireGuard rechaza repeticiones en tránsito. Una sola apertura por suelta, sin reintentos | Sin identificador ni caducidad a nivel de aplicación | Abierto | SR-SEC-005 |
 | TH-03 | Failsafe de C2 con RTL (AR-013); FC-04 es Mayor | Ninguno adicional: el efecto es seguro | Aceptado. Un inhibidor no cambia FC-04 |  |
-| TH-04 | ADR-001, `drop_guard`, FTS, vigilancia de consigna (SR-MSN-011-D) | La confirmación del piloto no llega a PX4 (hallazgo 1); MAVLink local sin filtro; sin endurecimiento del companion | Abierto | SR-SEC-004, 006, 007, 008 |
-| TH-05 | Solo `drop_guard` | Cualquier publicador DDS local puede mandar `vehicle_command` | Abierto | SR-SEC-004, 006 |
+| TH-04 | ADR-001, `drop_guard`, FTS, vigilancia de consigna (SR-MSN-011-D) | La confirmación del piloto no llega a PX4 (hallazgo 1); MAVLink local sin filtro; sin endurecimiento del companion | Aceptado temporalmente en SR-SEC-004 (ADR-010); abierto en el resto | SR-SEC-004, 006, 007, 008 |
+| TH-05 | Solo `drop_guard` | Cualquier publicador DDS local puede mandar `vehicle_command` | Aceptado temporalmente en SR-SEC-004 (ADR-010); abierto en SR-SEC-006 | SR-SEC-004, 006 |
 | TH-06 | El piloto mira posición, altura y viento (ConOps §4); AS-001. `drop_guard` usa la posición real de la FMU | Si el companion está comprometido, la telemetría de estado no es fiable | Aceptado con AS-001: el límite duro es la zona de `drop_guard` |  |
 | TH-07 | Doble armado y 0,5 s de persistencia (SR-FTS-003); banda 868 MHz | La «binding phrase» de ExpressLRS identifica el enlace, pero no debe darse por autenticación criptográfica (a comprobar); una grabación de un disparo legítimo se podría repetir | A comprobar | SR-SEC-013 |
 | TH-08 | El disparo automático por GNSS del FTS no depende del enlace; banda distinta del C2 | Con el enlace inhibido el piloto pierde la terminación manual | Aceptado. La independencia de banda protege frente a fallos, no frente a un inhibidor de banda ancha |  |
@@ -151,11 +151,11 @@ Los SR-SEC-001-D a SR-SEC-013-D están en DOC-03 §5 (fuente de verdad). Aquí s
 | SR-SEC-012-D | TH-09 | Indicadores de jamming y spoofing tratados como pérdida de navegación |
 | SR-SEC-013-D | TH-07, 10 | Enlaces ELRS con clave única; sin efecto por repetición |
 
-## 7. Decisiones que se proponen (ADR por numerar)
+## 7. Decisiones (ADR)
 
-No se decide nada en este documento; cada punto necesita su ADR tras revisión.
+Este documento no decide; cada punto necesita su ADR. El A está decidido; el B y el C siguen propuestos.
 
-**A. Autorización de suelta comprobable por PX4** (hallazgo 1). Hoy AR-007 depende de `payload_manager`. Opciones:
+**A. Autorización de suelta comprobable por PX4** (hallazgo 1). **Decidido en ADR-010 (30/09/2026):** A1 en S3, A3 opcional en ensayos a la vista, A2 obligatorio antes del primer vuelo con la confirmación por LTE o fuera de la vista. El mecanismo de A2 queda para otro ADR: un comando MAVLink sin firma no sirve, y las opciones reales son el desafío-respuesta con HMAC y un segundo canal físico. Hoy AR-007 depende de `payload_manager`. Opciones:
 
 | Opción | Qué implica | Ventaja | Coste |
 | --- | --- | --- | --- |
