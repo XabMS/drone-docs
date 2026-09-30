@@ -4,8 +4,10 @@ Exportación de la documentación existente a fecha 29/09/2026 (versión v0.1, b
 
 | Fichero | Contenido |
 | --- | --- |
-| [00-indice-y-alcance.md](00-indice-y-alcance.md) | Propósito, lista de los 14 documentos, ConOps (DOC-01 borrador), análisis funcional, FHA (DOC-04 borrador), decisiones D1–D10 |
+| [00-indice-y-alcance.md](00-indice-y-alcance.md) | Propósito, lista de los 14 documentos, supuestos de trabajo y decisiones D1–D10 |
+| [DOC-01-conops.md](DOC-01-conops.md) | ConOps (borrador v0.1) y análisis funcional F1–F11 (extraído del índice el 30/09/2026) |
 | [DOC-03-requisitos.md](DOC-03-requisitos.md) | Requisitos de aeronave (AR), hipótesis (AS), valores TBD y requisitos de sistema (SR) |
+| [DOC-04-fha.md](DOC-04-fha.md) | FHA de aeronave (borrador v0.2): condiciones de fallo FC-01…FC-18, justificación, mitigaciones y puntos abiertos |
 | [DOC-05-arquitectura.md](DOC-05-arquitectura.md) | Arquitectura del sistema (SAD), ADR-001 a ADR-009 |
 | [DOC-06-icd.md](DOC-06-icd.md) | Control de interfaces: uXRCE-DDS, MAVLink, RC, FTS, interfaces ROS 2 |
 | [DOC-08-hardware.md](DOC-08-hardware.md) | Estudio de hardware, presupuesto, masa y energía |
@@ -15,6 +17,6 @@ Exportación de la documentación existente a fecha 29/09/2026 (versión v0.1, b
 | [project/estado-proyecto.md](project/estado-proyecto.md) | Estado del proyecto, decisiones y hechos comprobados |
 | [project/HANDOFF_git_github.md](project/HANDOFF_git_github.md) | Handoff de organización Git/GitHub (ya ejecutado; histórico) |
 
-Documentos aún sin escribir: DOC-01, DOC-02, DOC-04, DOC-07, DOC-11, DOC-12, DOC-13, DOC-14 (DOC-01 y DOC-04 solo existen como borrador dentro de `00-indice-y-alcance.md`).
+Documentos aún sin escribir: DOC-02, DOC-07, DOC-11, DOC-12, DOC-13 y DOC-14 (el registro de ADR vive hoy en DOC-05 §8). De DOC-04 solo existe la FHA; faltan la PASA/PSSA y el análisis de causa común.
 
 Notas de la exportación: los «chips» del editor (fecha, mención, referencia) quedan como texto plano; los diagramas Mermaid se conservan en bloques ```mermaid y las fórmulas de drop_guard se pasaron a bloques ```math, que GitHub renderiza; los caracteres `\_` y `\~` son escapes de la exportación y se pueden limpiar más adelante.

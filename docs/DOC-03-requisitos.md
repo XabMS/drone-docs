@@ -63,6 +63,20 @@ Son 20 requisitos iniciales: 6 de misión y prestaciones, 9 de seguridad derivad
 
 AR-018 es el requisito que protege la hipótesis de arquitectura: es el que justifica que ROS 2 quede en DAL C.
 
+**Derivados de la FHA v0.2 (30/09/2026, propuestos, sin validar)**
+
+Cubren las condiciones de fallo nuevas (FC-13 a FC-18) y las dos que no tenían ningún AR (FC-01, FC-06). Todos van sin SR hijo hasta la PSSA; SR-PLD-005 pasa a colgar de AR-027. El FDAL de AR-021 y AR-025 es provisional: cubren una condición catastrófica reduciendo la exposición, y la PASA decidirá si basta.
+
+| ID | Requisito | Padre | FDAL | Verif. |
+| --- | --- | --- | --- | --- |
+| AR-021 | Las rutas de misión solo deberán discurrir por corredores aprobados de baja densidad de población y evitar las zonas prohibidas. | FC-01, FC-08, FC-13, FC-14, FC-17, AS-002 | B | A, T |
+| AR-022 | Ningún fallo simple de un motor, ESC o hélice deberá producir una condición catastrófica. **No es alcanzable con el cuadricóptero actual** (FHA §5, PA-01): queda como objetivo hasta que un ADR decida cómo se trata. | FC-13 | A | A |
+| AR-023 | La aeronave deberá vigilar en vuelo la tensión por celda y la temperatura de la batería de vuelo y ejecutar un aterrizaje inmediato cuando salgan de los límites del fabricante de la celda. | FC-14 | B | T |
+| AR-024 | PX4 deberá limitar toda consigna del computador de misión a la envolvente aprobada (volumen operacional, altura máxima y velocidad), de modo que un comportamiento erróneo del computador no pueda sacar a la aeronave del volumen ni ordenar una suelta fuera de zona. | FC-16, FC-08, FC-05 | B | A, T |
+| AR-025 | Las rutas deberán mantener una separación vertical de al menos \[TBD-9\] m sobre los obstáculos conocidos y respetar las zonas de autorización de aeródromos. | FC-17, AS-006 | B | A, I |
+| AR-026 | La aeronave solo deberá armarse por orden explícita del piloto remoto tras superar las comprobaciones de prevuelo, y deberá desarmarse automáticamente si no despega en \[TBD-8\] s. | FC-18 | C | T |
+| AR-027 | La velocidad de descenso del paquete tras la suelta no deberá superar \[TBD-6\] m/s. | FC-06 | C | T |
+
 ## 3. Hipótesis y valores por determinar
 
 Las hipótesis se validan igual que los requisitos (Planes §3). Si una resulta falsa, hay que reabrir la FHA.
@@ -74,12 +88,15 @@ Las hipótesis se validan igual que los requisitos (Planes §3). Si una resulta 
 | AS-003 | La operación es diurna y en condiciones meteorológicas visuales, sin precipitación. | AR-004 |
 | AS-004 | El piloto remoto supervisa una sola aeronave y está disponible durante todo el vuelo. | FC-10, AR-017 |
 | AS-005 | La cobertura GNSS es suficiente en la zona de operación a la altura de crucero. | FC-03, AR-014 |
+| AS-006 | En los corredores aprobados y por debajo de 120 m AGL el riesgo de encontrar una aeronave tripulada es bajo, y los aeródromos cercanos (p. ej. Blagnac) se excluyen con zonas de autorización. | FC-17, AR-025 |
 
 | TBD | Valor pendiente | Cómo se fija |
 | --- | --- | --- |
 | TBD-1 | Tiempo para detectar carga no liberada | Diseño del mecanismo de suelta |
 | TBD-2 | Tiempo de pérdida de C2 antes de la contingencia | Análisis de la tecnología de enlace; en PX4 corresponde a COM\_DL\_LOSS\_T |
 | TBD-3 | Tiempo para detectar la degradación de navegación | Análisis de deriva frente al margen de contención |
+| TBD-8 | Tiempo de espera para desarmar si no se despega (AR-026) | Procedimientos del hub (DOC-12) y parámetros de PX4 |
+| TBD-9 | Separación vertical mínima sobre obstáculos conocidos (AR-025) | Datos de obstáculos de la ruta y precisión vertical de la navegación |
 
 ## 4. Estructura en Doorstop
 
@@ -119,7 +136,7 @@ La validación y la publicación se añaden a GitHub Actions: cada pull request 
 
 ## 5. Requisitos de sistema (borrador v0.1)
 
-Son 45 requisitos repartidos en los 8 sistemas de DOC-05; todo AR tiene al menos un SR hijo, salvo AR-002 (masa), que se verifica a nivel aeronave con el presupuesto de DOC-08. Los nombres de parámetros de PX4 son orientativos y se comprueban en la versión fijada.
+Son 45 requisitos repartidos en los 8 sistemas de DOC-05; todo AR tiene al menos un SR hijo, salvo AR-021 a AR-027 (derivados de la FHA v0.2, a la espera de la PSSA) y AR-002 (masa), que se verifica a nivel aeronave con el presupuesto de DOC-08. Los nombres de parámetros de PX4 son orientativos y se comprueban en la versión fijada.
 
 **Nuevos valores pendientes:** TBD-4 tiempo sin latido Offboard antes del failsafe; TBD-5 tiempo de reacción del FTS; TBD-6 velocidad máxima de descenso del paquete con paracaídas; TBD-7 factor de seguridad de la retención de la carga.
 
@@ -170,7 +187,7 @@ Motivo de SR-MSN-011-D: la Pausa de QGroundControl no cambia el modo de PX4, as�
 | SR-PLD-002 | El PLD solo liberará la carga si se cumplen a la vez: orden del MSN, emitida solo tras la confirmación del piloto desde tierra (ADR-006), y autorización del FMS (SR-FMS-007). | AR-007, AR-008 | C | T |
 | SR-PLD-003 | Ante pérdida de alimentación o de señal, el mecanismo de suelta quedará cerrado y retendrá la carga. | AR-008, FC-05 | C | T |
 | SR-PLD-004 | El PLD detectará la presencia de la carga e informará al MSN de si se ha liberado en menos de TBD-1 s tras la orden. | AR-009 | C | T |
-| SR-PLD-005 | El paracaídas del paquete limitará la velocidad de descenso de 1 kg a TBD-6 m/s como máximo desde la altura mínima de suelta. | FC-06 | C | T |
+| SR-PLD-005 | El paracaídas del paquete limitará la velocidad de descenso de 1 kg a TBD-6 m/s como máximo desde la altura mínima de suelta. | AR-027, FC-06 | C | T |
 
 **COM: comunicaciones**
 

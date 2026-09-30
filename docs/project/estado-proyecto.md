@@ -73,7 +73,8 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - RUNBOOK_S1.md (Docker, legado; ahora en drone-sim/legacy); ya no se necesitan sus resultados: los sustituye la comprobación nativa
 
 ## Documentos
-- DOC-03: AR-001..AR-020, AS-001..005, TBD-1..7; SR v0.1: 45 + 2 derivados
+- DOC-03: AR-001..AR-020 (+ AR-021..027 propuestos desde la FHA v0.2, 30/09/2026), AS-001..006, TBD-1..9; SR v0.1: 45 + 2 derivados
+- DOC-01 (ConOps) y DOC-04 (FHA v0.2, FC-01..FC-18) extraídos del índice a ficheros propios el 30/09/2026. FC-13 (motor) y FC-14 (batería) incumplen el objetivo de fallo simple del MOC Light-UAS.2510 por diseño (PA-01); objetivos del MOC sin cotejar con el texto oficial (PA-02)
 - DOC-06 ICD v0.1; DOC-08 Hardware v0.1; DOC-10 Simulación v0.1 (S2 marcado terminado; §2, §6, §8 y estado actualizados a entorno nativo el 29/09/2026; su párrafo de estado dice que los scripts están pendientes de ejecutar: ya se ejecutaron)
 
 ## Preguntas abiertas
