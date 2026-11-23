@@ -50,7 +50,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 
 ## drop_guard
 - DropGuardLogic: 38 tests, 100 % sentencias/ramas/decisiones; módulo sobre v1.17.0 (parche 15 ficheros); SITL SIH 23/24
-- El parche añade msg/DropGuardStatus.msg: px4_msgs release/1.17 no lo trae → en S3 generar px4_msgs desde el msg/ del fork
+- El parche añade msg/DropGuardStatus.msg: px4_msgs release/1.17 no lo trae → `setup_native.sh` lo copia del msg/ del fork (drone-sim#1) y el CI de drone-ros lo descarga del tag `DRONE_PX4_REF` (v1.17.0-1.0.0)
 - En el portátil, PX4 con drop_guard arranca y publica el tópico DDS drop_guard_status (visto en el log del 29/09/2026)
 - Abiertos: valores EPH/EPV reales; algoritmo DG_ZONE_HASH (drone_core ya calcula drop_zone_hash = CRC32 canónico)
 
@@ -62,6 +62,13 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - Verificado en la nube con ROS 2 Jazzy compilado desde fuente + PX4 SITL SIH + XRCE agent: 64 tests; SIM-01, SIM-19 (pausa 1,2 s, RTL 1,4 s), SIM-20 pasan
 - Nuevos SR derivados: SR-MSN-011-D (vigilancia de consigna, AR-017), SR-MSN-012-D (home tras armado)
 - Desviaciones: sin carga de misión/geofence por MAVLink (SR-MSN-003 → S4), nodos no lifecycle, energía = max_route_m; leg_speed_mps 3 m/s
+
+## Hito S3 (suelta real; escenarios verificados 30/09/2026)
+- Software fusionado en `drone-ros` el 30/09/2026: `drone_payload` con `payload_manager` y su máquina de estados (#2), `mission_manager` pide la suelta en DROP con la acción `DropPayload` (#4) y `drone_gcs_bridge` con `pilot_confirm_bridge` (#6). CI con 156 tests
+- Cadena: `mission_manager` → `payload_manager` → `DO_GRIPPER` por DDS → `drop_guard` (PX4) → gripper simulado. La confirmación del piloto llega como `COMMAND_LONG MAV_CMD_USER_1` (31010) al componente 191 del companion, con `DG_ZONE_HASH` en `param1`/`param2` (ADR-006, ADR-010). La orden de apertura se envía una sola vez; `drop_guard` vuelve a comprobar la zona
+- `drone-sim` (#1, #2): `setup_native.sh` copia `DropGuardStatus.msg` del fork a `px4_msgs` (resuelto el bloqueo principal) y `scripts/run_s3.sh` lanza cada escenario con una simulación limpia. Detalle en `drone-sim/README_S3.md`
+- Resultado (portátil, PX4 SITL SIH, `drone-sim` en d70f510): 5 de 5 escenarios, 52 comprobaciones. `sim01_real` 15/15, `sim05` 10/10 (sin confirmación: no suelta y regresa con la carga), `sim06` 6/6 (orden forzada por DDS fuera de zona: la veta `drop_guard`), `sim07` 11/11 (carga no liberada: `NOT_RELEASED` y aviso al piloto), `abort` 10/10 (ABORT mientras espera: regreso sin abrir)
+- Límites: la confirmación la envía un script que imita a QGroundControl, no QGroundControl real; los `DG_*` los carga el script por MAVLink (en operación real los cargará el MSN, SR-MSN-003, S4); gripper y sensor de carga simulados. El `nightly` de `drone-sim` ejecuta los escenarios tras `check_native.sh` (verde 20–23/11/2026; falló el 19/11, causa sin analizar)
 
 ## Entorno nativo en el portátil (verificado 29/09/2026)
 - setup_native.sh completo sin errores; check_native.sh: 15 correctas, 0 fallidas (Ubuntu 24.04.5, Gazebo 8.15.0 = Harmonic, ROS Jazzy, SIH; 64 tests correctos; origen SIH = ops/toulouse.yaml; vehicle_status_v1 con datos, nav_state=4)
@@ -83,6 +90,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - Coordenadas del terreno de Blagnac; GNSS FTS no u-blox; UARTs/GPIO RPi5; 868 MHz duty cycle; MAVSDK; comando MAVLink de confirmación de suelta
 
 ## Siguiente
-- Hito S3 (suelta real): generar px4_msgs desde el msg/ del fork drone-px4 (release/1.17 no trae DropGuardStatus.msg; es el bloqueo principal), payload_manager con gripper simulado, drop_guard desde el fork y confirmación de suelta desde QGroundControl (ADR-006)
-- Corregir el párrafo de estado de DOC-10 §8 (dice que los scripts están pendientes de ejecutar) y evitar el log de `pxh>` en start_sim.sh
-- Después de S3: fijar drone.repos a un commit o tag de drone-ros; coordenadas de Blagnac antes de S4
+- Cerrar S3: actualizar DOC-10 §8 (estado de S3, y el párrafo que dice que los scripts de S2 están pendientes de ejecutar) y marcar SIM-05, SIM-06 y SIM-07 como verificados; evitar el log de `pxh>` en start_sim.sh; mirar por qué falló el nightly del 19/11
+- Probar la confirmación con QGroundControl real (hoy la envía un script) y cerrar los abiertos de `drop_guard` (EPH/EPV reales, `DG_ZONE_HASH`)
+- Después de S3: fijar drone.repos a un commit o tag de drone-ros; coordenadas de Blagnac antes de S4; S4 = carga de misión y geofence por MAVLink (SR-MSN-003)
+- DOC-15: ADR A (ya decidido en ADR-010), B y C pendientes
