@@ -81,7 +81,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - RUNBOOK_S1.md (Docker, legado; ahora en drone-sim/legacy); ya no se necesitan sus resultados: los sustituye la comprobación nativa
 
 ## Documentos
-- DOC-03: AR-001..AR-020 (+ AR-021..029 propuestos desde la FHA v0.2 y DOC-15, 30/09/2026), AS-001..006, TBD-1..9; SR v0.1: 45 + 2 derivados
+- DOC-03: AR-001..AR-020 (+ AR-021..029 propuestos desde la FHA v0.2 y DOC-15, 30/09/2026), AS-001..006, TBD-1..9 (TBD-1 fijado en 5 s el 23/11/2026, provisional); SR v0.1: 45 + 2 derivados
 - DOC-01 (ConOps) y DOC-04 (FHA v0.2, FC-01..FC-20) extraídos del índice a ficheros propios el 30/09/2026. FC-13 (motor) y FC-14 (batería) incumplen el objetivo de fallo simple del MOC Light-UAS.2510 por diseño (PA-01); objetivos del MOC sin cotejar con el texto oficial (PA-02)
 - DOC-15 (seguridad de la información, 30/09/2026): PX4 v1.17.0 no implementa la firma de MAVLink 2; acepta terminación de vuelo, desarme forzado y `PARAM_SET` sin comprobar origen ni armado; `drop_guard` no conoce la confirmación del piloto (la exige solo `payload_manager`). Requisitos SR-SEC-001..013 propuestos; ADR A, B y C pendientes
 - DOC-06 ICD v0.1; DOC-08 Hardware v0.1; DOC-10 Simulación v0.1 (S2 marcado terminado; §2, §6, §8 y estado actualizados a entorno nativo el 29/09/2026; estado de S3 añadido en §8)
@@ -90,7 +90,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - Coordenadas del terreno de Blagnac; GNSS FTS no u-blox; UARTs/GPIO RPi5; 868 MHz duty cycle; MAVSDK; comando MAVLink de confirmación de suelta
 
 ## Siguiente
-- Cerrar S3: evitar el log de `pxh>` en start_sim.sh; mirar por qué falló el nightly del 19/11; fijar TBD-1 (tiempo de detección de carga no liberada), que SIM-07 aún no mide
+- Cerrar S3: evitar el log de `pxh>` en start_sim.sh; mirar por qué falló el nightly del 19/11
 - Probar la confirmación con QGroundControl real (hoy la envía un script) y cerrar los abiertos de `drop_guard` (EPH/EPV reales, `DG_ZONE_HASH`)
 - Después de S3: fijar drone.repos a un commit o tag de drone-ros; coordenadas de Blagnac antes de S4; S4 = carga de misión y geofence por MAVLink (SR-MSN-003)
 - DOC-15: ADR A (ya decidido en ADR-010), B y C pendientes
