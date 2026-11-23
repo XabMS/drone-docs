@@ -43,7 +43,7 @@ Son 20 requisitos iniciales: 6 de misión y prestaciones, 9 de seguridad derivad
 | --- | --- | --- | --- | --- |
 | AR-007 | La carga solo deberá liberarse tras una confirmación explícita del piloto remoto. | FC-05 | B | T |
 | AR-008 | La carga no deberá liberarse fuera del volumen de suelta definido para la misión, aunque se reciba la orden. | FC-05 | B | A, T |
-| AR-009 | La aeronave deberá detectar que la carga no se ha liberado y notificarlo al piloto en menos de \[TBD-1\] s. | FC-07 | C | T |
+| AR-009 | La aeronave deberá detectar que la carga no se ha liberado y notificarlo al piloto en menos de 5 s (TBD-1) desde la orden de apertura. | FC-07 | C | T |
 | AR-010 | La aeronave deberá permanecer dentro del volumen operacional aprobado y aplicar una contingencia al alcanzar su límite. | FC-08 | A | A, T |
 | AR-011 | La aeronave deberá disponer de un FTS que termine el vuelo por orden del piloto o automáticamente al salir del volumen de contingencia, independiente del autopiloto. | FC-08, FC-12 | A | A, T |
 | AR-012 | El FTS no deberá activarse sin una orden del piloto o una condición de disparo definida. | FC-11 | A | A, T |
@@ -94,7 +94,7 @@ Las hipótesis se validan igual que los requisitos (Planes §3). Si una resulta 
 
 | TBD | Valor pendiente | Cómo se fija |
 | --- | --- | --- |
-| TBD-1 | Tiempo para detectar carga no liberada | Diseño del mecanismo de suelta |
+| TBD-1 | Tiempo para detectar carga no liberada | **Fijado en 5 s** (23/11/2026, provisional), contados desde la orden de apertura hasta el aviso al piloto: 3 s de espera de `payload_manager` (`verify_timeout_s`) más el paso hasta tierra, con margen. Se revisa con el mecanismo real (D1) |
 | TBD-2 | Tiempo de pérdida de C2 antes de la contingencia | Análisis de la tecnología de enlace; en PX4 corresponde a COM\_DL\_LOSS\_T |
 | TBD-3 | Tiempo para detectar la degradación de navegación | Análisis de deriva frente al margen de contención |
 | TBD-8 | Tiempo de espera para desarmar si no se despega (AR-026) | Procedimientos del hub (DOC-12) y parámetros de PX4 |
@@ -188,7 +188,7 @@ Motivo de SR-MSN-011-D: la Pausa de QGroundControl no cambia el modo de PX4, as�
 | SR-PLD-001 | El PLD retendrá una carga de 1,0 kg con un factor de seguridad de al menos TBD-7 frente a las cargas de vuelo. | AR-001 | C | A, T |
 | SR-PLD-002 | El PLD solo liberará la carga si se cumplen a la vez: orden del MSN, emitida solo tras la confirmación del piloto desde tierra (ADR-006), y autorización del FMS (SR-FMS-007). | AR-007, AR-008 | C | T |
 | SR-PLD-003 | Ante pérdida de alimentación o de señal, el mecanismo de suelta quedará cerrado y retendrá la carga. | AR-008, FC-05 | C | T |
-| SR-PLD-004 | El PLD detectará la presencia de la carga e informará al MSN de si se ha liberado en menos de TBD-1 s tras la orden. | AR-009 | C | T |
+| SR-PLD-004 | El PLD detectará la presencia de la carga e informará al MSN de si se ha liberado en menos de 5 s (TBD-1) tras la orden. | AR-009 | C | T |
 | SR-PLD-005 | El paracaídas del paquete limitará la velocidad de descenso de 1 kg a TBD-6 m/s como máximo desde la altura mínima de suelta. | AR-027, FC-06 | C | T |
 
 **COM: comunicaciones**
