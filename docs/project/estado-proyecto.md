@@ -75,7 +75,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - Fallos menores de la primera ejecución de setup_native.sh, ya corregidos en drone-sim: falso aviso del agente XRCE (pipefail) y numpy 2.x tapando al del sistema en .deps/pylibs (ahora numpy<2). Verificado en clon limpio: setup sin avisos y check_native.sh con 15 correctas, 0 fallidas y 64 tests
 - Escenarios verificados en el portátil (29/09/2026, PX4 SITL SIH, una simulación limpia por escenario; drone-sim en ed732e2): s2_scenarios.py sim19_pause PASA (CONTINGENCY en 1,2 s), sim19_rtl PASA (CONTINGENCY en 1,2 s), sim20 Donostia PASA (PREFLIGHT → … → COMPLETED sin cambiar código), sim01 Toulouse PASA (misión completa, unos 12 min con el arranque); tests/sitl_drop_guard_test.py PASA 6/6 casos (A–F). Resultados equivalentes a los de la nube (§Hito S2)
 - Pendiente de probar en el portátil: SIM=gz (Gazebo) con la gráfica integrada (no lo necesita S3)
-- Higiene: con stdin cerrado, PX4 SITL repite el prompt `pxh>` sin parar y el log de start_sim.sh llegó a 5,5 GB en ~25 min de simulación; lanzar PX4 sin terminal (`< /dev/null` o `-d`) o no volcar su salida a fichero. Pendiente de corregir en drone-sim
+- Higiene: con stdin cerrado o en `/dev/null`, la consola `pxh` de PX4 SITL repite el prompt sin parar (el log de start_sim.sh llegó a 5,5 GB en ~25 min; 52 MB en 30 s con `< /dev/null`). Corregido el 23/11/2026 (drone-sim#4): sin terminal, start_sim.sh cambia su stdin por una tubería que nunca da EOF. No se usa `-d` (PX4 sin consola) porque el target de make no deja pasarlo
 
 ## Hito S1
 - RUNBOOK_S1.md (Docker, legado; ahora en drone-sim/legacy); ya no se necesitan sus resultados: los sustituye la comprobación nativa
@@ -90,7 +90,7 @@ Handoff de organización Git/GitHub: project/HANDOFF_git_github.md (ejecutado; h
 - Coordenadas del terreno de Blagnac; GNSS FTS no u-blox; UARTs/GPIO RPi5; 868 MHz duty cycle; MAVSDK; comando MAVLink de confirmación de suelta
 
 ## Siguiente
-- Cerrar S3: evitar el log de `pxh>` en start_sim.sh; mirar por qué falló el nightly del 19/11
+- Cerrar S3: mirar por qué falló el nightly del 19/11
 - Probar la confirmación con QGroundControl real (hoy la envía un script) y cerrar los abiertos de `drop_guard` (EPH/EPV reales, `DG_ZONE_HASH`)
 - Después de S3: fijar drone.repos a un commit o tag de drone-ros; coordenadas de Blagnac antes de S4; S4 = carga de misión y geofence por MAVLink (SR-MSN-003)
 - DOC-15: ADR A (ya decidido en ADR-010), B y C pendientes
